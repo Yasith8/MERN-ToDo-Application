@@ -1,0 +1,32 @@
+node_module
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# IDE or Editor Specific Files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Compiled Files
+*.class
+*.pyc
+
+# Dependency Directories
+node_modules/
+vendor/
+
+# Build and Temporary Files
+build/
+dist/
+temp/
+
+# Logs and Output Files
+*.log
+*.out
+
+# Personal or Sensitive Information
+.env
+config.ini
+
