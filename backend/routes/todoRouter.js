@@ -25,7 +25,7 @@ const getToDo = async(req, res) => {
 const addToDo = async(req, res) => {
     try {
         if (!req.body.title || !req.body.todoDate) {
-            res.status(400).send({ message: "Fill Data fields on title" })
+            res.status(400).send({ message: "Fill Data fields on title,tododate" })
         } else {
             const todo = {
                 title: req.body.title,
@@ -42,4 +42,39 @@ const addToDo = async(req, res) => {
     }
 }
 
-module.exports = { addToDo, getAllToDo, getToDo };
+
+const updateToDo = async(req, res) => {
+    try {
+        if (!req.body.title || !req.body.todoDate) {
+            res.status(400).send({ message: "Fill Data fields on title,tododate" })
+        }
+
+        const { id } = req.params
+
+        const toDo = await Todo.findByIdAndUpdate(id, req.body);
+
+        if (!toDo) {
+            return res.status(400).send("Not found any todo list");
+        } else {
+            return res.status(200).send("Todo item Update Successfully");
+        }
+
+    } catch (error) {
+        return res.status(500).send({ message: error })
+    }
+}
+
+
+const deleteToDo = async(req, res) => {
+    const { id } = req.params;
+
+    const todo = await Todo.findByIdAndDelete(id);
+
+    if (!todo) {
+        return res.status(400).send("The task was not found")
+    } else {
+        return res.status(200).send("The task delete successfully")
+    }
+}
+
+module.exports = { addToDo, getAllToDo, getToDo, updateToDo, deleteToDo };
