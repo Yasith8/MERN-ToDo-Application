@@ -42,6 +42,10 @@ function Home() {
         })
         .catch((err)=>console.error(err))
     },[])
+
+    const updateTodos = (newTodo) => {
+        setTodos(prevTodos => [...prevTodos, newTodo]);
+    };
     
   return (
     <div className='mx-[20rem] mt-[3rem]'>
@@ -66,7 +70,7 @@ function Home() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <AddModel/>
+        <AddModel updateTodos={updateTodos} handleClose={handleClose}/>
       </Modal>
             {/* test code*/}
             </div>
