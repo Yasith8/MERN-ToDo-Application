@@ -4,11 +4,27 @@ import Typography from "@mui/material/Typography";
 import axios from "axios";
 import Loader from "./Loader";
 
-function AddModel({ updateTodos, handleClose }) {
+function EditModel({ handleUpdateClose, itemKey }) {
+  const [task, setTask] = useState({});
+
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [taskDate, setTaskDate] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get(`http://localhost:3000/todo/${itemKey}`)
+      .then((res) => {
+        setLoading(false);
+        setTask(res.data);
+      })
+      .catch((err) => {
+        setLoading(false);
+        alert("System has following errors: " + err);
+      });
+  }, []);
 
   const submitTaskHandler = () => {
     if (taskTitle.trim() == "" || taskDate.trim() == "") {
@@ -22,18 +38,16 @@ function AddModel({ updateTodos, handleClose }) {
     };
     setLoading(true);
     axios
-      .post("http://localhost:3000/todo", todo)
+      .put(`http://localhost:3000/todo/${itemKey}`, todo)
       .then(() => {
         setLoading(false);
-        updateTodos(todo);
-        handleClose();
+        handleUpdateClose();
       })
       .catch((err) => {
         console.log(err);
         setLoading(false);
       });
   };
-
   return (
     <div>
       {loading ? (
@@ -50,6 +64,7 @@ function AddModel({ updateTodos, handleClose }) {
                 <input
                   type="text"
                   id="tname"
+                  value={task.title}
                   onChange={(e) => setTaskTitle(e.target.value)}
                   className="border-2 p-2 border-black rounded-md w-[20rem]"
                 />
@@ -59,6 +74,7 @@ function AddModel({ updateTodos, handleClose }) {
                 <label htmlFor="tdes">Description</label>
                 <textarea
                   id="tdes"
+                  value={task.description}
                   onChange={(e) => setTaskDescription(e.target.value)}
                   className="border-2 p-2 border-black rounded-md w-[20rem]"
                 />
@@ -69,6 +85,7 @@ function AddModel({ updateTodos, handleClose }) {
                 <input
                   type="date"
                   id="tdate"
+                  value={task.todoDate}
                   onChange={(e) => setTaskDate(e.target.value)}
                   className="border-2 p-2 border-black rounded-md w-[20rem] ml-11"
                 />
@@ -97,4 +114,4 @@ function AddModel({ updateTodos, handleClose }) {
   );
 }
 
-export default AddModel;
+export default EditModel;
