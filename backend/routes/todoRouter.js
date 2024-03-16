@@ -65,6 +65,21 @@ const updateToDo = async(req, res) => {
 }
 
 
+const updateActive = async(req, res) => {
+    const { id } = req.params;
+    const todo = await Todo.findById(id)
+
+    if (!todo) {
+        return res.status(400).send("Not found any todo Task")
+    } else {
+        todo.isActive = !todo.isActive;
+        await todo.save()
+
+        return res.status(200).send("Item Updated Successfully")
+    }
+}
+
+
 const deleteToDo = async(req, res) => {
     const { id } = req.params;
 
@@ -77,4 +92,4 @@ const deleteToDo = async(req, res) => {
     }
 }
 
-module.exports = { addToDo, getAllToDo, getToDo, updateToDo, deleteToDo };
+module.exports = { addToDo, getAllToDo, getToDo, updateToDo, deleteToDo, updateActive };

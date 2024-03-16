@@ -23,6 +23,8 @@ function Home() {
     const [addTodo,setAddTodo]=useState(false);
     const handleOpen = () => setAddTodo(true);
     const handleClose = () => setAddTodo(false);
+
+    const[filter,setFilter]=useState('active');
     
     useEffect(()=>{    
         
@@ -33,19 +35,43 @@ function Home() {
             setTime('Good Afternoon!')
         }
     })
-    useEffect(()=>{
-        setLoading(true)
+
+
+    const fetchTodo=()=>{
         axios.get('http://localhost:3000/todo')
         .then((res)=>{
             setTodos(res.data)
             setLoading(false)
         })
         .catch((err)=>console.error(err))
+    }
+    useEffect(()=>{
+        fetchTodo()
+        const interval = setInterval(fetchTodo, 2000); // Polling every 2 seconds
+        return () => clearInterval(interval); // Cleanup
     },[])
 
     const updateTodos = (newTodo) => {
         setTodos(prevTodos => [...prevTodos, newTodo]);
     };
+
+    const activationHandler=(id)=>{
+        setLoading(true)
+        axios
+        .put(`http://localhost:3000/todo/active/${id}`)
+        .then(()=>{
+            setLoading(false)
+            fetchTodo()
+        })
+        .catch((err)=>{
+            alert("System has following Errors: "+err)
+        })
+    }
+
+
+    const selectHandler=(e)=>{
+        setFilter(e.target.value)
+    }
     
   return (
     <div className='mx-[20rem] mt-[3rem]'>
@@ -77,44 +103,38 @@ function Home() {
 
 
 
-            <select className='border-2 border-black p-3 w-[10rem] rounded-xl'>
-                <option value="">Today</option>
-                <option value="">This Week</option>
-                <option value="">Completed</option>
-                <option value="">This Month</option>
+            <select className='border-2 border-black p-3 w-[10rem] rounded-xl' onChange={selectHandler}>
+                <option value="complete">Completed</option>
+                <option value="active">Active</option>
             </select>
 
         </div>
 
         <div>
             {loading?(<div className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2'><Loader/></div>):(
-                <div>{todos.map((item,index)=>(
+                <div>{todos
+                    
+                    .filter(item => filter === 'active' ? item.isActive : !item.isActive)
+                    .map((item,index)=>(
 
-                    <div className='flex w-full p-3 justify-between items-center bg-black text-white rounded-xl my-3' key={item._id}>
-                    <Checkbox size="lg" variant="solid" />
+                    <button className='flex w-full p-3 justify-between items-center bg-black text-white rounded-xl my-3' key={item._id}>
+                    <Checkbox size="lg" variant="solid" onChange={()=>activationHandler(item._id)} />
                     <div>
                     <h1 className='font-bold text-[1rem] text-left'>{item.title}</h1>
                     <p className='font-thin text-[0.9rem]'>{item.description}</p>
                     </div>
                     <h1>{new Date(item.todoDate).toLocaleDateString()}</h1>
-                </div>
+                </button>
 
 
-                ))}</div>
+                ))
+                }</div>
             )}
+
         </div>
 
 
         
-                {/* <div className='flex w-full p-3 justify-between items-center bg-black text-white rounded-xl'>
-                    <Checkbox size="lg" variant="solid" />
-                    <div>
-                    <h1 className='font-bold text-[1rem] '>Learn Something</h1>
-                    <p className='font-thin text-[0.9rem]'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio, veritatis!</p>
-                    </div>
-                    <h1>12/24/2022</h1>
-                </div> */}
-
 
 
     </div>

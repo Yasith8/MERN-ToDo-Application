@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const cors = require('cors');
 
-const { addToDo, getAllToDo, getToDo, updateToDo, deleteToDo } = require('./routes/todoRouter')
+const { addToDo, getAllToDo, getToDo, updateToDo, deleteToDo, updateActive } = require('./routes/todoRouter')
 
 app.use(express.json())
 
@@ -21,6 +21,8 @@ app.get('/todo/:id', getToDo)
 app.post('/todo', addToDo)
 
 app.put('/todo/:id', updateToDo)
+
+app.put('/todo/active/:id', updateActive)
 
 app.delete('/todo/:id', deleteToDo)
 
