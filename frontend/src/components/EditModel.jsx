@@ -5,7 +5,7 @@ import axios from "axios";
 import Loader from "./Loader";
 
 function EditModel({ handleUpdateClose, itemKey }) {
-  const [task, setTask] = useState({});
+  //const [task, setTask] = useState({});
 
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
@@ -18,13 +18,29 @@ function EditModel({ handleUpdateClose, itemKey }) {
       .get(`http://localhost:3000/todo/${itemKey}`)
       .then((res) => {
         setLoading(false);
-        setTask(res.data);
+        setTaskTitle(res.data.title);
+        setTaskDescription(res.data.description);
+        setTaskDate(res.data.todoDate);
       })
       .catch((err) => {
         setLoading(false);
         alert("System has following errors: " + err);
       });
   }, []);
+
+  const deleteHanlder = () => {
+    setLoading(true);
+    axios
+      .delete(`http://localhost:3000/todo/${itemKey}`)
+      .then(() => {
+        setLoading(false);
+        handleUpdateClose();
+      })
+      .catch((err) => {
+        alert("this system has following errors: " + err);
+        setLoading(false);
+      });
+  };
 
   const submitTaskHandler = () => {
     if (taskTitle.trim() == "" || taskDate.trim() == "") {
@@ -64,7 +80,7 @@ function EditModel({ handleUpdateClose, itemKey }) {
                 <input
                   type="text"
                   id="tname"
-                  value={task.title}
+                  value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
                   className="border-2 p-2 border-black rounded-md w-[20rem]"
                 />
@@ -74,7 +90,7 @@ function EditModel({ handleUpdateClose, itemKey }) {
                 <label htmlFor="tdes">Description</label>
                 <textarea
                   id="tdes"
-                  value={task.description}
+                  value={taskDescription}
                   onChange={(e) => setTaskDescription(e.target.value)}
                   className="border-2 p-2 border-black rounded-md w-[20rem]"
                 />
@@ -85,7 +101,7 @@ function EditModel({ handleUpdateClose, itemKey }) {
                 <input
                   type="date"
                   id="tdate"
-                  value={task.todoDate}
+                  value={taskDate}
                   onChange={(e) => setTaskDate(e.target.value)}
                   className="border-2 p-2 border-black rounded-md w-[20rem] ml-11"
                 />
@@ -93,17 +109,18 @@ function EditModel({ handleUpdateClose, itemKey }) {
 
               <div className="flex items-center justify-between mt-6">
                 <button
-                  className="w-[8rem] border-2 border-slate-950  h-[3rem] p-2 mx-[5rem] rounded-md font-bold"
+                  className="w-[8rem] border-2 border-red-600 bg-red-600 text-white  h-[3rem] p-2 mx-[5rem] rounded-md font-bold"
                   type="reset"
+                  onClick={deleteHanlder}
                 >
-                  Clear
+                  Delete
                 </button>
                 <button
                   className="w-[8rem] bg-slate-950 border-2 border-slate-950 text-white h-[3rem] p-2 mx-[5rem] rounded-md font-bold"
                   type="submit"
                   onClick={submitTaskHandler}
                 >
-                  Add Task
+                  Update Task
                 </button>
               </div>
             </form>

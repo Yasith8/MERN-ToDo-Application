@@ -28,8 +28,32 @@ function Home() {
   const handleOpen = () => setAddTodo(true);
   const handleClose = () => setAddTodo(false);
 
-  const handleUpdateOpen = () => setEditTodo(true);
-  const handleUpdateClose = () => setEditTodo(false);
+  /* const handleUpdateOpen = () => setEditTodo(true);
+  const handleUpdateClose = () => setEditTodo(false); */
+
+  useEffect(() => {
+    const interval = setInterval(fetchTodo, 20000); // Polling every 20 seconds
+    return () => clearInterval(interval); // Cleanup
+    const initialEditTodos = {};
+    todos.forEach((todo) => {
+      initialEditTodos[todo._id] = false;
+    });
+    setEditTodo(initialEditTodos);
+  }, [todos]);
+
+  const handleUpdateOpen = (id) => {
+    setEditTodo((prevEditTodos) => ({
+      ...prevEditTodos,
+      [id]: true,
+    }));
+  };
+
+  const handleUpdateClose = (id) => {
+    setEditTodo((prevEditTodos) => ({
+      ...prevEditTodos,
+      [id]: false,
+    }));
+  };
 
   const [filter, setFilter] = useState("active");
 
@@ -51,9 +75,10 @@ function Home() {
       })
       .catch((err) => console.error(err));
   };
+
   useEffect(() => {
     fetchTodo();
-    const interval = setInterval(fetchTodo, 2000); // Polling every 2 seconds
+    const interval = setInterval(fetchTodo, 1000); // Polling every 1 seconds
     return () => clearInterval(interval); // Cleanup
   }, []);
 
@@ -83,7 +108,7 @@ function Home() {
       <div className="font-bold text-[2rem]">Hello Yasith, {time}👋</div>
       <div className="font-bold text-[1.5rem]">{currentDate}</div>
 
-      <div className="w-full flex items-center justify-between">
+      <div className="w-full flex items-center justify-between mt-5">
         <div className="flex gap-x-4 items-center">
           <div className="flex items-center border-2 border-black p-2 rounded-xl">
             <input
@@ -124,7 +149,7 @@ function Home() {
         </select>
       </div>
 
-      <div>
+      <div className="mt-6">
         {loading ? (
           <div className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
             <Loader />
@@ -138,17 +163,18 @@ function Home() {
               )
               .map((item, index) => (
                 <div>
-                  <button
-                    className="flex w-full p-3 justify-between items-center bg-black text-white rounded-xl my-3"
-                    key={item._id}
-                    onClick={handleUpdateOpen}
-                  >
+                  <div className="flex w-full p-3 justify-between items-center bg-black text-white rounded-xl my-3 cursor-pointer">
                     <Checkbox
                       size="lg"
                       variant="solid"
                       onChange={() => activationHandler(item._id)}
                     />
-                    <div>
+
+                    <div
+                      className="flex flex-col items-center"
+                      key={item._id}
+                      onClick={() => handleUpdateOpen(item._id)}
+                    >
                       <h1 className="font-bold text-[1rem] text-left">
                         {item.title}
                       </h1>
@@ -156,16 +182,22 @@ function Home() {
                         {item.description}
                       </p>
                     </div>
-                    <h1>{new Date(item.todoDate).toLocaleDateString()}</h1>
-                  </button>
+
+                    <h1
+                      key={item._id}
+                      onClick={() => handleUpdateOpen(item._id)}
+                    >
+                      {new Date(item.todoDate).toLocaleDateString()}
+                    </h1>
+                  </div>
                   <Modal
-                    open={editTodo}
-                    onClose={handleUpdateClose}
+                    open={editTodo[item._id]}
+                    onClose={() => handleUpdateClose(item._id)}
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                   >
                     <EditModel
-                      handleUpdateClose={handleUpdateClose}
+                      handleUpdateClose={() => handleUpdateClose(item._id)}
                       itemKey={item._id}
                     />
                   </Modal>
