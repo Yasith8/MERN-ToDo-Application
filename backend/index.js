@@ -13,6 +13,9 @@ const URL = process.env.URL
 
 app.use(cors());
 
+app.get('/', (req, res) => {
+    res.json({ msg: 'Welcome to the Todo API' })
+})
 
 app.get('/todo', getAllToDo)
 
